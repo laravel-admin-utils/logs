@@ -3,8 +3,8 @@
 namespace Elegant\Utils\OperationLog\Http\Middleware;
 
 use Illuminate\Http\Request;
-use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Str;
 
 class OperationLogMiddleware
@@ -20,24 +20,20 @@ class OperationLogMiddleware
     public function handle(Request $request, \Closure $next)
     {
         if ($this->shouldLogOperation($request)) {
-            $request->setTrustedProxies(request()->getClientIps(), Request::HEADER_X_FORWARDED_FOR);
-
-            $operation = array_map(function ($as) {
-                return trans('admin.' . $as);
-            }, explode('.', str_replace('admin.', '', $request->route()->action['as'])));
-
-            $log = [
-                'administrator_id' => Auth::user()->id,
-                'operation' => implode('.', $operation),
-                'path'    => $request->path(),
-                'method'  => $request->method(),
-                'ip'      => $request->getClientIp(),
-                'input'   => json_encode($request->input()),
-            ];
-
             try {
+                $operation = array_map(function ($as) {
+                    return trans('admin.' . $as);
+                }, explode('.', str_replace('admin.', '', $request->route()->action['as'])));
+
                 $logModel = config('elegant-utils.operation_log.model');
-                $logModel::create($log);
+                $logModel::create([
+                    'administrator_id' => Auth::user()->id,
+                    'operation' => implode('.', $operation),
+                    'path'    => $request->path(),
+                    'method'  => $request->method(),
+                    'ip'      => $request->getClientIp(),
+                    'input'   => json_encode($request->input()),
+                ]);
             } catch (\Exception $exception) {
                 // pass
             }
@@ -53,7 +49,10 @@ class OperationLogMiddleware
      */
     protected function shouldLogOperation(Request $request)
     {
-        return Auth::user() && config('elegant-utils.operation_log.enable') && !$this->inExceptArray($request) && $this->inAllowedMethods($request->method());
+        return Auth::user()
+            && config('elegant-utils.operation_log.enable')
+            && !$this->inExceptArray($request)
+            && $this->inAllowedMethods($request->method());
     }
 
     /**
@@ -85,17 +84,25 @@ class OperationLogMiddleware
      */
     protected function inExceptArray($request)
     {
-        foreach (config('elegant-utils.operation_log.excepts') as $except) {
-            $except = admin_base_path($except);
+        if (in_array(Route::current()->getName(), ['handle_form', 'handle_action', 'handle_selectable', 'handle_renderable', 'require-config', 'error404'])) {
+            return true;
+        }
+
+        foreach (config('elegant-utils.operation_log.except_paths') as $except) {
             if ($except !== '/') {
                 $except = trim($except, '/');
             }
 
-            if (array_intersect(array_keys($request->input()), ['_pjax', '_token', '_method', '_previous_'])) {
-                return true;
+            $methods = [];
+
+            if (Str::contains($except, ':')) {
+                list($methods, $except) = explode(':', $except);
+                $methods = explode(',', $methods);
             }
 
-            if ($request->is($except) || empty($request->route()->getAction('as')) || substr($request->route()->getAction('as'), 0,6) !== config('elegant-utils.admin.route.as')) {
+            $methods = array_map('strtoupper', $methods);
+
+            if ($request->is($except) && (empty($methods) || in_array($request->method(), $methods))) {
                 return true;
             }
         }

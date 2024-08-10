@@ -11,7 +11,9 @@ return [
 
     'allowed_methods' => ['GET', 'HEAD', 'POST', 'PUT', 'DELETE', 'CONNECT', 'OPTIONS', 'TRACE', 'PATCH'],
 
-    'excepts' => [
+    'hidden_keys' => ['_pjax', '_token', '_method', '_previous_', 'password', 'password_confirmation'],
+
+    'except_paths' => [
         "operation_logs",
 //        "auth_logs/*",
     ]

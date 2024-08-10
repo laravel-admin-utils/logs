@@ -40,7 +40,14 @@ class OperationLogController extends AdminController
         $table->column('input', trans('admin.input'))->display(function () {
             return trans('admin.view');
         })->modal(trans('admin.view') . trans('admin.input'), function ($modal) {
-            return '<pre>'. empty($modal->input) ? '{}' :json_encode($modal->input, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE).'</pre>';
+            $input = json_decode($modal->input, true);
+            $input = Arr::except($input, config('elegant-utils.operation_log.hidden_keys', []));
+
+            if (empty($input)) {
+                return '<pre>{}</pre>';
+            }
+
+            return '<pre>'. json_encode($input, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE) . '</pre>';
         });
 
         $table->column('created_at', trans('admin.created_at'));
