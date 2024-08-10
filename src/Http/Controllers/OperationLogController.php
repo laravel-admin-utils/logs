@@ -29,7 +29,11 @@ class OperationLogController extends AdminController
         $table->column('id', 'ID')->sortable();
         $table->column('administrator.name', trans('admin.operator'));
         $table->column('operation', trans('admin.behave'))->display(function ($operation) {
-            return trans($operation);
+            $operation = array_map(function ($as) {
+                return trans('admin.' . $as);
+            }, explode('.', $operation));
+
+            return implode('.', $operation);
         });
         $table->column('method', trans('admin.http_method'))->display(function ($method) use ($logModel) {
             $color = Arr::get($logModel::$methodColors, $method, 'grey');

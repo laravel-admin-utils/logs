@@ -21,14 +21,10 @@ class OperationLogMiddleware
     {
         if ($this->shouldLogOperation($request)) {
             try {
-                $operation = array_map(function ($as) {
-                    return trans('admin.' . $as);
-                }, explode('.', str_replace('admin.', '', $request->route()->action['as'])));
-
                 $logModel = config('elegant-utils.operation_log.model');
                 $logModel::create([
                     'administrator_id' => Auth::user()->id,
-                    'operation' => implode('.', $operation),
+                    'operation' => str_replace('admin.', '', $request->route()->action['as']),
                     'path'    => $request->path(),
                     'method'  => $request->method(),
                     'ip'      => $request->getClientIp(),
