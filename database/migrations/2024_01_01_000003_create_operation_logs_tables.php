@@ -23,7 +23,7 @@ return new class extends Migration
     {
         Schema::create(config('elegant-utils.operation_log.table'), function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('administrator_id')->index();
+            $table->unsignedBigInteger('user_id')->index();
             $table->string('operation');
             $table->string('path');
             $table->string('method', 10);

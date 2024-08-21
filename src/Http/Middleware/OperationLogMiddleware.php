@@ -23,7 +23,7 @@ class OperationLogMiddleware
             try {
                 $logModel = config('elegant-utils.operation_log.model');
                 $logModel::create([
-                    'administrator_id' => Auth::user()->id,
+                    'user_id' => Auth::user()->id,
                     'operation' => str_replace('admin.', '', $request->route()->action['as']),
                     'path'    => $request->path(),
                     'method'  => $request->method(),
@@ -80,27 +80,10 @@ class OperationLogMiddleware
      */
     protected function inExceptArray($request)
     {
-        if (in_array(Route::current()->getName(), ['handle_form', 'handle_action', 'handle_selectable', 'handle_renderable', 'require-config', 'error404'])) {
+        $excludes = array_merge(config('elegant-utils.authorization.excepts'), config('elegant-utils.operation_log.excepts'));
+        
+        if (in_array(Route::current()->getName(), $excludes)) {
             return true;
-        }
-
-        foreach (config('elegant-utils.operation_log.except_paths') as $except) {
-            if ($except !== '/') {
-                $except = trim($except, '/');
-            }
-
-            $methods = [];
-
-            if (Str::contains($except, ':')) {
-                list($methods, $except) = explode(':', $except);
-                $methods = explode(',', $methods);
-            }
-
-            $methods = array_map('strtoupper', $methods);
-
-            if ($request->is($except) && (empty($methods) || in_array($request->method(), $methods))) {
-                return true;
-            }
         }
 
         return false;

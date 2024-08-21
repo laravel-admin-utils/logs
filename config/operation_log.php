@@ -3,18 +3,16 @@
 return [
     'enable' => true,
 
-    'table' => 'operation_logs',
+    'table' => 'auth_logs',
 
-    'model' => Elegant\Utils\OperationLog\Models\OperationLog::class,
-
-//    'controller' => Elegant\Utils\OperationLog\Http\Controllers\OperationLogController::class,
+    'model' => App\Models\AuthLog::class,
 
     'allowed_methods' => ['GET', 'HEAD', 'POST', 'PUT', 'DELETE', 'CONNECT', 'OPTIONS', 'TRACE', 'PATCH'],
 
     'hidden_keys' => ['_pjax', '_token', '_method', '_previous_', 'password', 'password_confirmation'],
 
-    'except_paths' => [
-        "operation_logs",
-//        "auth_logs/*",
+    'excepts' => [
+        "auth_logs.index",
+        "auth_logs.destroy",
     ]
 ];

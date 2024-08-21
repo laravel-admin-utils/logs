@@ -11,13 +11,13 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @method static find(int $int)
  * @method static create(array $log)
  */
-class OperationLog extends Model
+class AuthLog extends Model
 {
     use DefaultDatetimeFormat;
     use SoftDeletes;
 
     protected $fillable = [
-        'administrator_id',
+        'user_id',
         'operation',
         'path',
         'method',
@@ -53,12 +53,12 @@ class OperationLog extends Model
     }
 
     /**
-     * Log belongs to users.
+     * Log belongs to user.
      *
      * @return BelongsTo
      */
-    public function administrator(): BelongsTo
+    public function user(): BelongsTo
     {
-        return $this->belongsTo(config('elegant-utils.admin.database.administrator_model'));
+        return $this->belongsTo(config('elegant-utils.admin.database.user_model'));
     }
 }

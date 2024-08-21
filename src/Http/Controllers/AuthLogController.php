@@ -6,7 +6,7 @@ use Elegant\Utils\Http\Controllers\AdminController;
 use Elegant\Utils\Table;
 use Illuminate\Support\Arr;
 
-class OperationLogController extends AdminController
+class AuthLogController extends AdminController
 {
     /**
      * {@inheritdoc}
@@ -27,7 +27,7 @@ class OperationLogController extends AdminController
         $table->model()->orderByDesc('id');
 
         $table->column('id', 'ID')->sortable();
-        $table->column('administrator.name', trans('admin.operator'));
+        $table->column('user.name', trans('admin.operator'));
         $table->column('operation', trans('admin.behave'))->display(function ($operation) {
             $operation = array_map(function ($as) {
                 return trans('admin.' . $as);
@@ -64,9 +64,9 @@ class OperationLogController extends AdminController
         $table->disableCreateButton();
 
         $table->filter(function (Table\Filter $filter) use ($logModel) {
-            $userModel = config('elegant-utils.admin.database.administrator_model');
+            $userModel = config('elegant-utils.admin.database.user_model');
 
-            $filter->equal('administrator_id', trans('admin.administrator'))->select($userModel::pluck('name', 'id'));
+            $filter->equal('user_id', trans('admin.administrator'))->select($userModel::pluck('name', 'id'));
             $filter->equal('method', trans('admin.http_method'))->select(array_combine($logModel::$methods, $logModel::$methods));
             $filter->like('path', trans('admin.http_uri'));
             $filter->equal('ip', trans('admin.http_ip'));

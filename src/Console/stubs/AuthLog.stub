@@ -1,0 +1,10 @@
+<?php
+
+namespace App\Models;
+
+use Elegant\Utils\OperationLog\Models\AuthLog as BaseAuthLog;
+
+class AuthLog extends BaseAuthLog
+{
+
+}

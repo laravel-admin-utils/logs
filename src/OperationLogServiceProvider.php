@@ -23,10 +23,6 @@ class OperationLogServiceProvider extends ServiceProvider
             return ;
         }
 
-        $this->app->booted(function () use ($extension) {
-            OperationLog::routes($extension->routes);
-        });
-
         if ($this->app->runningInConsole() && $database = $extension->database) {
             $this->publishes([$database => database_path()], 'admin-operation-log-database');
         }
@@ -44,10 +40,11 @@ class OperationLogServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        app('router')->aliasMiddleware('admin.operation-log', OperationLogMiddleware::class);
+        $router = app('router');
 
-        // 替换配置文件
-        config(['elegant-utils.admin.route.middleware.log' => 'admin.operation-log',]);
+        $router->aliasMiddleware('admin.operation-log', OperationLogMiddleware::class);
+
+        $router->middlewareGroup('admin', array_merge($router->getMiddlewareGroups()['admin'], ['admin.operation-log']));
 
         $this->commands($this->commands);
     }

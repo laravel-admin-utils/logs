@@ -1,0 +1,10 @@
+<?php
+
+namespace DummyNamespace;
+
+use Elegant\Utils\OperationLog\Http\Controllers\AuthLogController as BaseAuthLogController;
+
+class AuthLogController extends BaseAuthLogController
+{
+
+}
