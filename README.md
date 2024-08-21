@@ -22,4 +22,4 @@ php artisan vendor:publish --provider="Elegant\Utils\OperationLog\OperationLogSe
 php artisan operation-log:init
 ```
 
-open the link http://localhost/operation_logs
+open the link http://localhost/auth/logs
