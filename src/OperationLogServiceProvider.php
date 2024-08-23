@@ -30,6 +30,10 @@ class OperationLogServiceProvider extends ServiceProvider
         if ($this->app->runningInConsole() && $config = $extension->config) {
             $this->publishes([$config => config_path('elegant-utils')], 'admin-operation-log-config');
         }
+
+        $this->app->booted(function () use ($extension) {
+            $extension::routes($extension->routes);
+        });
     }
 
 

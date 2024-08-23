@@ -5,7 +5,9 @@ return [
 
     'table' => 'auth_logs',
 
-    'model' => App\Models\AuthLog::class,
+    'model' => Elegant\Utils\OperationLog\Models\AuthLog::class,
+    
+    'controller' => Elegant\Utils\OperationLog\Http\Controllers\AuthLogController::class,
 
     'allowed_methods' => ['GET', 'HEAD', 'POST', 'PUT', 'DELETE', 'CONNECT', 'OPTIONS', 'TRACE', 'PATCH'],
 
