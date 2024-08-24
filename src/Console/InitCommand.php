@@ -40,14 +40,8 @@ class InitCommand extends Command
      */
     public function handle()
     {
-        
-        $this->initDatabase();
-    }
-
-    public function initDatabase()
-    {
         $this->call('migrate');
-        
-        OperationLog::import();
+
+        OperationLog::importMenus();
     }
 }
